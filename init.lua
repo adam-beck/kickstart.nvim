@@ -230,8 +230,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })
 
-vim.lsp.enable 'tsgo'
-
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -604,6 +602,7 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
+        tsgo = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -615,7 +614,7 @@ require('lazy').setup({
       -- You can press `g?` for help in this menu.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'lua_ls', -- Lua Language server
+        'lua-language-server', -- Lua Language server
         'stylua', -- Used to format Lua code
         -- You can add other tools here that you want Mason to install
       })
@@ -851,9 +850,7 @@ require('lazy').setup({
             input = { '<(%w+)[^<>]->.-</%1>', '^<()%w+().*</()%w+()>$' },
             output = function()
               local tag_name = MiniSurround.user_input 'Tag name'
-              if tag_name == nil then
-                return nil
-              end
+              if tag_name == nil then return nil end
               return { left = tag_name, right = tag_name }
             end,
           },
