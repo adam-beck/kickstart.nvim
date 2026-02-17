@@ -604,7 +604,6 @@ require('lazy').setup({
         -- ts_ls = {},
         tsgo = {},
         -- superhtml = {},
-
       }
 
       -- Ensure the servers and tools above are installed
@@ -701,6 +700,8 @@ require('lazy').setup({
         typescript = { 'oxfmt', 'biome', 'prettierd' },
         javascriptreact = { 'oxfmt', 'biome', 'prettierd' },
         typescriptreact = { 'oxfmt', 'biome', 'prettierd' },
+        html = { 'oxfmt', 'biome', 'prettierd' },
+        scss = { 'oxfmt', 'biome', 'prettierd' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
