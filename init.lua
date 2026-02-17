@@ -604,6 +604,7 @@ require('lazy').setup({
         -- ts_ls = {},
         tsgo = {},
         -- superhtml = {},
+
       }
 
       -- Ensure the servers and tools above are installed
@@ -617,6 +618,8 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'lua-language-server', -- Lua Language server
         'stylua', -- Used to format Lua code
+        'eslint-lsp', -- ESLint language server
+        'stylelint-lsp', -- Stylelint language server
         -- You can add other tools here that you want Mason to install
       })
 
@@ -654,6 +657,12 @@ require('lazy').setup({
         },
       })
       vim.lsp.enable 'lua_ls'
+
+      vim.lsp.config('eslint', { capabilities = capabilities })
+      vim.lsp.enable 'eslint'
+
+      vim.lsp.config('stylelint_lsp', { capabilities = capabilities })
+      vim.lsp.enable 'stylelint_lsp'
     end,
   },
 
