@@ -603,6 +603,7 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         tsgo = {},
+        -- superhtml = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -687,10 +688,10 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         astro = { 'biome', 'prettierd' },
-        javascript = { 'biome', 'prettierd' },
-        typescript = { 'biome', 'prettierd' },
-        javascriptreact = { 'biome', 'prettierd' },
-        typescriptreact = { 'biome', 'prettierd' },
+        javascript = { 'oxfmt', 'biome', 'prettierd' },
+        typescript = { 'oxfmt', 'biome', 'prettierd' },
+        javascriptreact = { 'oxfmt', 'biome', 'prettierd' },
+        typescriptreact = { 'oxfmt', 'biome', 'prettierd' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -882,7 +883,23 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     config = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      local filetypes = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'typescript',
+        'javascript',
+        'typescriptreact',
+        'javascriptreact',
+      }
       require('nvim-treesitter').install(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
