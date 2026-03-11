@@ -115,7 +115,26 @@ return {
     dependencies = { 'echasnovski/mini.icons' },
     opts = {},
     config = function()
-      require('fzf-lua').setup {}
+      local config = require 'fzf-lua.config'
+      local actions = require('trouble.sources.fzf').actions
+      config.defaults.actions.files['ctrl-t'] = actions.open
+      require('fzf-lua').setup {
+        grep = {
+          actions = {
+            ['ctrl-x'] = {
+              fn = function(_, opts)
+                local o = vim.tbl_deep_extend('keep', { resume = true }, opts.__call_opts or {})
+                if opts.file_ignore_patterns and vim.tbl_contains(opts.file_ignore_patterns, '%.spec%.') then
+                  o.file_ignore_patterns = {}
+                else
+                  o.file_ignore_patterns = { '%.spec%.', '%.test%.' }
+                end
+                opts.__call_fn(o)
+              end,
+            },
+          },
+        },
+      }
 
       local builtin = require 'fzf-lua'
 
@@ -154,7 +173,11 @@ return {
     'stevearc/oil.nvim',
     ---@module 'oil'
     ---@type oil.SetupOpts
-    opts = {},
+    opts = {
+      keymaps = {
+        ['<C-l>'] = false,
+      },
+    },
     dependencies = { { 'echasnovski/mini.icons', opts = {} } },
     -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
     lazy = false,
@@ -298,6 +321,7 @@ return {
           },
         },
       }
+      vim.keymap.set('n', '<leader>ccc', ':CodeCompanionChat Toggle %<CR>', { desc = 'CodeCompanionChat Toggle' })
     end,
   },
   {

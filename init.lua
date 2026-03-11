@@ -114,7 +114,7 @@ vim.o.showmode = false
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
+-- vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -602,9 +602,8 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
-        tsgo = {},
+        -- tsgo = {},
         -- superhtml = {},
-
       }
 
       -- Ensure the servers and tools above are installed
@@ -663,6 +662,9 @@ require('lazy').setup({
 
       vim.lsp.config('stylelint_lsp', { capabilities = capabilities })
       vim.lsp.enable 'stylelint_lsp'
+
+      vim.lsp.config('ts_ls', { capabilities = capabilities })
+      vim.lsp.enable 'ts_ls'
     end,
   },
 
