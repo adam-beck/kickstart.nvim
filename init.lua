@@ -611,6 +611,17 @@ require('lazy').setup({
         -- ts_ls = {},
 
         stylua = {}, -- Used to format Lua code
+        bashls = {},
+        cssls = {},
+        css_variables = {},
+        cssmodules_ls = {},
+        emmet_language_server = {},
+        eslint = {},
+        html = {},
+        jsonls = {},
+        stylelint_lsp = {},
+        superhtml = {},
+        vtsls = {},
 
         -- Special Lua Config, as recommended by neovim help docs
         lua_ls = {
@@ -652,6 +663,9 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         -- You can add other tools here that you want Mason to install
+        'oxfmt',
+        'oxlint',
+        'sql-formatter',
       })
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
