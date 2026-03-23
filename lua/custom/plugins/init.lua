@@ -10,6 +10,20 @@ vim.keymap.set('n', '<leader>cpe', ':Copilot enable<cr>', { silent = true, norem
 
 vim.g.copilot_enabled = false
 
+vim.api.nvim_create_user_command('GetFilename', function(opts)
+  local modifier = '%:t' -- default: filename only
+
+  if opts.args == 'full' then
+    modifier = '%:p'
+  elseif opts.args == 'dir' then
+    modifier = '%:h'
+  end
+
+  local name = vim.fn.expand(modifier)
+  print(name)
+  vim.fn.setreg('+', name)
+end, { nargs = '?' })
+
 return {
   {
     'NickvanDyke/opencode.nvim',
@@ -43,6 +57,10 @@ return {
       -- vim.keymap.set('n', '+', '<C-a>', { desc = 'Increment under cursor', noremap = true })
       -- vim.keymap.set('n', '-', '<C-x>', { desc = 'Decrement under cursor', noremap = true })
     end,
+  },
+  {
+    'esmuellert/codediff.nvim',
+    cmd = 'CodeDiff',
   },
   {
     'sindrets/diffview.nvim',
@@ -104,12 +122,6 @@ return {
     'olrtg/nvim-emmet',
     config = function() vim.keymap.set({ 'n', 'v' }, '<leader>xe', require('nvim-emmet').wrap_with_abbreviation) end,
   },
-  -- {
-  --   'nvimdev/indentmini.nvim',
-  --   config = function()
-  --     require('indentmini').setup()
-  --   end,
-  -- },
   {
     'ibhagwan/fzf-lua',
     dependencies = { 'echasnovski/mini.icons' },
@@ -323,6 +335,8 @@ return {
       }
       vim.keymap.set('n', '<leader>ccc', ':CodeCompanionChat Toggle %<CR>', { desc = 'CodeCompanionChat Toggle' })
     end,
+
+    vim.keymap.set('n', '<leader>ccc', '<cmd>CodeCompanionChat Toggle<CR>', { desc = '[C]ode[Companion][C]hat [T]oggle' }),
   },
   {
     'github/copilot.vim',
