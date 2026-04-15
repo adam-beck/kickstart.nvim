@@ -8,7 +8,16 @@ vim.g.copilot_enabled = false -- Disable Copilot by default
 vim.keymap.set('n', '<leader>cpd', ':Copilot disable<cr>', { silent = true, noremap = true }) -- Disable Copilot
 vim.keymap.set('n', '<leader>cpe', ':Copilot enable<cr>', { silent = true, noremap = true }) -- Enable Copilot
 
+-- vim.keymap.set('n', 'gx', function()
+--   local url = vim.fn.expand '<cfile>'
+--   local browser = os.getenv 'BROWSER' or 'firefox'
+--   vim.fn.jobstart({ browser, url }, { detach = true })
+-- end)
+
 vim.g.copilot_enabled = false
+
+-- Don't close MarkdownPreview just because the buffer is not active
+vim.g.mkdp_auto_close = 0
 
 vim.api.nvim_create_user_command('GetFilename', function(opts)
   local modifier = '%:t' -- default: filename only
@@ -175,6 +184,13 @@ return {
     end,
   },
   'JoosepAlviste/nvim-ts-context-commentstring',
+  {
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+
+    -- Completion for `blink.cmp`
+    -- dependencies = { "saghen/blink.cmp" },
+  },
   {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
