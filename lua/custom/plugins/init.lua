@@ -337,27 +337,7 @@ return {
       'nvim-treesitter/nvim-treesitter',
     },
     config = function()
-      require('codecompanion').setup {
-        adapters = {
-          acp = {
-            claude_code = function()
-              return require('codecompanion.adapters').extend('claude_code', {
-                env = {
-                  CLAUDE_CODE_OAUTH_TOKEN = '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',
-                },
-              })
-            end,
-          },
-        },
-        interactions = {
-          chat = {
-            adapter = {
-              name = 'claude_code',
-              model = 'sonnet',
-            },
-          },
-        },
-      }
+      require('codecompanion').setup {}
       vim.keymap.set('n', '<leader>ccc', ':CodeCompanionChat <CR>', { desc = 'CodeCompanionChat Toggle' })
     end,
 

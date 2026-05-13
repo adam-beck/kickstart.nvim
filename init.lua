@@ -609,10 +609,16 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
-        -- tsgo = {},
+        tsgo = {},
         -- superhtml = {},
 
-        vtsls = {},
+        elmls = {},
+        -- vtsls = {
+        --   autoUseWorkspaceTsdk = true,
+        -- },
+        -- ts_ls = {
+        --   pluginPaths = { './node_modules' },
+        -- },
       }
 
       -- Ensure the servers and tools above are installed
@@ -651,41 +657,115 @@ require('lazy').setup({
         desc = '[F]ormat buffer',
       },
     },
-    ---@module 'conform'
-    ---@type conform.setupOpts
-    opts = {
-      notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          return nil
-        else
-          return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
-          }
-        end
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        astro = { 'biome', 'prettierd' },
-        javascript = { 'oxfmt', 'biome', 'prettierd' },
-        typescript = { 'oxfmt', 'biome', 'prettierd' },
-        javascriptreact = { 'oxfmt', 'biome', 'prettierd' },
-        typescriptreact = { 'oxfmt', 'biome', 'prettierd' },
-        html = { 'oxfmt', 'biome', 'prettierd' },
-        scss = { 'oxfmt', 'biome', 'prettierd' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-      },
-    },
+    config = function()
+      require('conform').setup {
+        notify_on_error = false,
+        format_on_save = function(bufnr)
+          local disable_filetypes = { c = true, cpp = true }
+          if disable_filetypes[vim.bo[bufnr].filetype] then
+            return nil
+          else
+            return {
+              timeout_ms = 500,
+              lsp_format = 'fallback',
+            }
+          end
+        end,
+        formatters_by_ft = {
+          lua = { 'stylua' },
+          astro = { 'oxfmt', 'biome', 'prettierd' },
+          javascript = { 'oxfmt', 'biome', 'prettierd', 'prettier' },
+          typescript = { 'oxfmt', 'biome', 'prettierd', 'prettier' },
+          javascriptreact = { 'oxfmt', 'biome', 'prettierd', 'prettier' },
+          typescriptreact = { 'oxfmt', 'biome', 'prettierd', 'prettier' },
+          html = { 'oxfmt', 'biome', 'prettierd' },
+          scss = { 'oxfmt', 'biome', 'prettierd' },
+          elm = { 'elm-format' },
+        },
+      }
+
+      local function get_formatter_command(name, config_files)
+        return {
+          command = function(ctx)
+            local root = ctx.root or vim.fn.getcwd()
+            local local_bin = root .. '/node_modules/.bin/' .. name
+            if vim.fn.executable(local_bin) == 1 then return local_bin end
+            return name
+          end,
+          condition = function(ctx) return vim.fs.find(config_files, { path = vim.fn.fnamemodify(ctx.filename, ':h'), upward = true })[1] ~= nil end,
+        }
+      end
+
+      local prettier_configs = {
+        '.prettierrc',
+        '.prettierrc.js',
+        '.prettierrc.json',
+        '.prettierrc.yaml',
+        '.prettierrc.yml',
+        'prettier.config.js',
+        'prettier.config.ts',
+      }
+
+      require('conform').formatters.oxfmt = get_formatter_command('oxfmt', {
+        '.oxfmtrc.json',
+        '.oxfmtrc.jsonc',
+        'oxfmt.config.ts',
+      })
+
+      require('conform').formatters.prettier = get_formatter_command('prettier', prettier_configs)
+      require('conform').formatters.prettierd = get_formatter_command('prettierd', prettier_configs)
+      require('conform').formatters.biome = get_formatter_command('biome', { 'biome.json', 'biome.jsonc' })
+    end,
   },
+
+  -- { -- Autoformat
+  --   'stevearc/conform.nvim',
+  --   event = { 'BufWritePre' },
+  --   cmd = { 'ConformInfo' },
+  --   keys = {
+  --     {
+  --       '<leader>f',
+  --       function() require('conform').format { async = true, lsp_format = 'fallback' } end,
+  --       mode = '',
+  --       desc = '[F]ormat buffer',
+  --     },
+  --   },
+  --   ---@module 'conform'
+  --   ---@type conform.setupOpts
+  --   opts = {
+  --     notify_on_error = false,
+  --     format_on_save = function(bufnr)
+  --       -- Disable "format_on_save lsp_fallback" for languages that don't
+  --       -- have a well standardized coding style. You can add additional
+  --       -- languages here or re-enable it for the disabled ones.
+  --       local disable_filetypes = { c = true, cpp = true }
+  --       if disable_filetypes[vim.bo[bufnr].filetype] then
+  --         return nil
+  --       else
+  --         return {
+  --           timeout_ms = 500,
+  --           lsp_format = 'fallback',
+  --         }
+  --       end
+  --     end,
+  --     formatters_by_ft = {
+  --       lua = { 'stylua' },
+  --       astro = { 'oxfmt', 'biome', 'prettierd' },
+  --       javascript = { 'oxfmt', 'biome', 'prettierd' },
+  --       typescript = { 'oxfmt', 'biome', 'prettierd' },
+  --       javascriptreact = { 'oxfmt', 'biome', 'prettierd' },
+  --       typescriptreact = { 'oxfmt', 'biome', 'prettierd' },
+  --       html = { 'oxfmt', 'biome', 'prettierd' },
+  --       scss = { 'oxfmt', 'biome', 'prettierd' },
+  --       elm = { 'elm-format' },
+  --       -- Conform can also run multiple formatters sequentially
+  --       -- python = { "isort", "black" },
+  --       --
+  --       -- You can use 'stop_after_first' to run the first available formatter from the list
+  --       -- javascript = { "prettierd", "prettier", stop_after_first = true },
+  --     },
+  --   },
+  -- },
 
   { -- Autocompletion
     'saghen/blink.cmp',
@@ -882,7 +962,7 @@ require('lazy').setup({
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter-intro`
     config = function()
       -- ensure basic parser are installed
-      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'styled' }
       require('nvim-treesitter').install(parsers)
 
       ---@param buf integer
@@ -928,6 +1008,12 @@ require('lazy').setup({
           end
         end,
       })
+
+      require('nvim-treesitter').setup {
+        highlight = {
+          enable = true,
+        },
+      }
     end,
   },
 
