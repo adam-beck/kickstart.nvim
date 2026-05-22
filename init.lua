@@ -610,7 +610,11 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         tsgo = {},
+
+        jsonls = {},
+        emmet_language_server = {},
         -- superhtml = {},
+        oxlint = {},
 
         elmls = {},
         -- vtsls = {
@@ -642,6 +646,9 @@ require('lazy').setup({
         vim.lsp.config(name, server)
         vim.lsp.enable(name)
       end
+
+      vim.lsp.config('docker_compose_language_service', {})
+      vim.lsp.enable 'docker_compose_language_service'
     end,
   },
 
@@ -787,12 +794,10 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function() require('luasnip.loaders.from_vscode').lazy_load() end,
+          },
         },
         opts = {},
       },
