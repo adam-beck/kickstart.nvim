@@ -34,6 +34,22 @@ vim.api.nvim_create_user_command('GetFilename', function(opts)
 end, { nargs = '?' })
 
 return {
+
+  -- lazy.nvim
+  {
+    'nemanjamalesija/smart-paste.nvim',
+    event = 'VeryLazy',
+    config = true,
+  },
+  {
+    'romus204/tree-sitter-manager.nvim',
+    dependencies = {}, -- tree-sitter CLI must be installed system-wide
+    config = function() require('tree-sitter-manager').setup() end,
+  },
+  {
+    'davidmh/mdx.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+  },
   {
     'NickvanDyke/opencode.nvim',
     dependencies = {
@@ -337,7 +353,27 @@ return {
       'nvim-treesitter/nvim-treesitter',
     },
     config = function()
-      require('codecompanion').setup {}
+      require('codecompanion').setup {
+        interactions = {
+          chat = {
+            adapter = {
+              name = 'claude_code',
+              model = 'Sonnet',
+            },
+          },
+        },
+        adapters = {
+          acp = {
+            claude_code = function()
+              return require('codecompanion.adapters').extend('claude_code', {
+                env = {
+                  CLAUDE_CODE_OAUTH_TOKEN = os.getenv 'CLAUDE_CODE_OAUTH_TOKEN',
+                },
+              })
+            end,
+          },
+        },
+      }
       vim.keymap.set('n', '<leader>ccc', ':CodeCompanionChat <CR>', { desc = 'CodeCompanionChat Toggle' })
     end,
 
