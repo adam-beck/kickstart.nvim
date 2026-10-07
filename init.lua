@@ -662,15 +662,45 @@ require('lazy').setup({
         },
       }
 
+      -- local function get_formatter_command(name, config_files)
+      --   return {
+      --     command = function(ctx)
+      --       local root = ctx.root or vim.fn.getcwd()
+      --       local local_bin = root .. '/node_modules/.bin/' .. name
+      --       if vim.fn.executable(local_bin) == 1 then return local_bin end
+      --       return name
+      --     end,
+      --     condition = function(ctx) return vim.fs.find(config_files, { path = vim.fn.fnamemodify(ctx.filename, ':h'), upward = true })[1] ~= nil end,
+      --   }
+      -- end
       local function get_formatter_command(name, config_files)
+        local function find_config(ctx)
+          return vim.fs.find(config_files, {
+            path = ctx.dirname,
+            upward = true,
+          })[1]
+        end
+
         return {
           command = function(ctx)
-            local root = ctx.root or vim.fn.getcwd()
-            local local_bin = root .. '/node_modules/.bin/' .. name
-            if vim.fn.executable(local_bin) == 1 then return local_bin end
+            local dir = ctx.dirname
+
+            while dir do
+              local local_bin = dir .. '/node_modules/.bin/' .. name
+              if vim.fn.executable(local_bin) == 1 then return local_bin end
+
+              local parent = vim.fs.dirname(dir)
+              if parent == dir then break end
+              dir = parent
+            end
+
             return name
           end,
-          condition = function(ctx) return vim.fs.find(config_files, { path = vim.fn.fnamemodify(ctx.filename, ':h'), upward = true })[1] ~= nil end,
+          cwd = function(ctx)
+            local config = find_config(ctx)
+            return config and vim.fs.dirname(config) or ctx.dirname
+          end,
+          condition = function(ctx) return find_config(ctx) ~= nil end,
         }
       end
 
