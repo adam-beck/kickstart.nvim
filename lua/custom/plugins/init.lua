@@ -353,27 +353,41 @@ return {
       'nvim-treesitter/nvim-treesitter',
     },
     config = function()
-      require('codecompanion').setup {
-        interactions = {
-          chat = {
-            adapter = {
-              name = 'claude_code',
-              model = 'Sonnet',
+      -- Personal machines have CLAUDE_CODE_OAUTH_TOKEN set; anywhere else only GitHub (Copilot) is allowed.
+      local claude_token = os.getenv 'CLAUDE_CODE_OAUTH_TOKEN'
+      local opts
+      if claude_token and claude_token ~= '' then
+        opts = {
+          interactions = {
+            chat = {
+              adapter = {
+                name = 'claude_code',
+                model = 'Sonnet',
+              },
             },
           },
-        },
-        adapters = {
-          acp = {
-            claude_code = function()
-              return require('codecompanion.adapters').extend('claude_code', {
-                env = {
-                  CLAUDE_CODE_OAUTH_TOKEN = os.getenv 'CLAUDE_CODE_OAUTH_TOKEN',
-                },
-              })
-            end,
+          adapters = {
+            acp = {
+              claude_code = function()
+                return require('codecompanion.adapters').extend('claude_code', {
+                  env = {
+                    CLAUDE_CODE_OAUTH_TOKEN = claude_token,
+                  },
+                })
+              end,
+            },
           },
-        },
-      }
+        }
+      else
+        opts = {
+          interactions = {
+            chat = { adapter = 'copilot' },
+            inline = { adapter = 'copilot' },
+            cmd = { adapter = 'copilot' },
+          },
+        }
+      end
+      require('codecompanion').setup(opts)
       vim.keymap.set('n', '<leader>ccc', ':CodeCompanionChat <CR>', { desc = 'CodeCompanionChat Toggle' })
     end,
 
